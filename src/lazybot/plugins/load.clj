@@ -56,4 +56,6 @@
   (:cmd
    "Connect the bot to a server specified in your configuration. ADMIN ONLY!"
    #{"reconnect" "connect"}
-   (fn [{:keys [args]}] (init-bot (first args)))))
+   (fn [{:keys [com args] :as com-m}] (if (nil? (args))
+                                    (init-bot (:network @com))
+                                    (init-bot (first args))))))
