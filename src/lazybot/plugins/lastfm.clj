@@ -40,7 +40,7 @@
   (let [user (get-association server nick nick)]
     (when-let [latest (first-if-sequential (get-in (least/read "user.getRecentTracks"
                                                                (get-api-key bot)
-                                                               {:user user 
+                                                               {:user user
                                                                 :limit 1})
                                                    [:recenttracks :track]))]
       (format "%s %s: %s - %s [%s]"
@@ -57,7 +57,7 @@
     (when-let [targets (seq
                          (for [{:keys [name playcount]} (get-in (least/read (str "user.getTop" kind)
                                                                             (get-api-key bot)
-                                                                            {:user user 
+                                                                            {:user user
                                                                              :limit 5
                                                                              :period (or period "overall")})
                                                                 cull)]

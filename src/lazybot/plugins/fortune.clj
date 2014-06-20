@@ -7,7 +7,7 @@
 (defplugin
   (:cmd
    "Tells you what your fortune is. :>"
-   #{"fortune"} 
+   #{"fortune"}
    (fn [com-m]
      (let [db (fetch :fortune)]
        (if (zero? (count db))
@@ -16,7 +16,7 @@
 
   (:cmd
    "Adds a fortune to the fortune database."
-   #{"addfortune"} 
+   #{"addfortune"}
    (fn [{:keys [args] :as com-m}]
      (if (seq args)
        (do

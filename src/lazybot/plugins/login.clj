@@ -8,7 +8,7 @@
 
 (defn check-login [user mask pass server bot]
   (when-let [userconf (get-in @bot [:config server :users user])]
-    (when (or (= mask (:host userconf)) (= pass (:pass userconf))) 
+    (when (or (= mask (:host userconf)) (= pass (:pass userconf)))
       (dosync (alter bot assoc-in [:logged-in user] (userconf :privs))))))
 
 (defn logged-in? [bot user]
@@ -36,7 +36,7 @@
              (dosync (alter bot update-in [:logged-in]
                             dissoc nick)))))
 
-  (:cmd 
+  (:cmd
    "Best executed via PM. Give it your password, and it will log you in."
    #{"login"}
    (fn [{:keys [com bot nick host user channel args] :as com-m}]
@@ -44,7 +44,7 @@
        (if (check-login nick hmask (first args) (:network @com) bot)
           (send-message com-m "You've been logged in.")
           (send-message com-m "Username and password combination/hostmask do not match.")))))
-  
+
   (:cmd
    "Logs you out."
    #{"logout"}
@@ -64,7 +64,7 @@
                  (if-let [user ((:users ((:config @bot) (:network @com))) nick)]
                    (name (:privs user))
                    "nobody")
-                 "; you are " 
+                 "; you are "
                  (if (logged-in? bot nick)
                    "logged in."
                    "not logged in!")))))))

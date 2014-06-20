@@ -22,7 +22,7 @@
                            html))
                        (catch Exception _))]
       (let [[critic user] (map (comp l/text first)
-                               [(l/select html 
+                               [(l/select html
                                           (l/descendant-of
                                            (l/class= "main_details")
                                            (l/class= "score_value")))

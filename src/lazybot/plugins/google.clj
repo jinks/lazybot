@@ -1,7 +1,7 @@
 (ns lazybot.plugins.google
   (:require [lazybot.registry :refer [defplugin send-message]]
             [lazybot.utilities :refer [trim-string]]
-            [cheshire.core :refer [parse-string]] 
+            [cheshire.core :refer [parse-string]]
             [clojure.string :as s]
             [clj-http.client :as http])
   (:import org.apache.commons.lang.StringEscapeUtils

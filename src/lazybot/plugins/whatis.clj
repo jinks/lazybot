@@ -9,11 +9,11 @@
                        (str " is " (:is result))
                        " does not exist in my database."))))
 
-(defplugin 
+(defplugin
   (:cmd
    "Teaches the bot a new thing. It takes a name and whatever you want to assign the name
    to. For example: $learn me a human being."
-   #{"learn"} 
+   #{"learn"}
    (fn [{:keys [args] :as com-m}]
      (let [[subject & is] args
            is-s (apply str (interpose " " is))]
@@ -21,14 +21,14 @@
          (destroy! :whatis {:subject subject})
          (insert! :whatis {:subject subject :is is-s})
          (send-message com-m "My memory is more powerful than M-x butterfly. I won't forget it.")))))
-   
-   (:cmd 
+
+   (:cmd
     "Pass it a key, and it will tell you what is at the key in the database."
     #{"whatis"}
     (fn [{[what] :args :as com-m}]
       (tell-about what com-m)))
 
-   (:cmd 
+   (:cmd
     "Pass it a key, and it will tell the recipient what is at the key in the database via PM
 Example - $tell G0SUB about clojure"
     #{"tell"}
@@ -38,14 +38,14 @@ Example - $tell G0SUB about clojure"
    
    (:cmd 
     "Forgets the value of a key."
-    #{"forget"} 
+    #{"forget"}
     (fn [{[what] :args :as com-m}]
       (do (destroy! :whatis {:subject what})
           (send-message com-m (str "If " what " was there before, it isn't anymore. R.I.P.")))))
 
-   (:cmd 
+   (:cmd
     "Gets a random value from the database."
-    #{"rwhatis"} 
+    #{"rwhatis"}
     (fn [com-m]
       (let [what (-> :whatis fetch rand-nth :subject)]
         (tell-about what com-m))))

@@ -20,12 +20,12 @@
   (->> s (#(.toLowerCase %)) (map char-to-leet) (apply str)))
 
 (defplugin
-  (:cmd 
-   "Takes words and replaces them with their leetspeak alternatives." 
-   #{"elite"} 
+  (:cmd
+   "Takes words and replaces them with their leetspeak alternatives."
+   #{"elite"}
    (fn [{:keys [args] :as com-m}]
-     (send-message com-m 
-                   (->> args 
+     (send-message com-m
+                   (->> args
                         (interpose " ")
                         (apply str)
                         (#(.toLowerCase %))

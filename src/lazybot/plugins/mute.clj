@@ -9,13 +9,13 @@
 
   (:cmd
    "Mutes the bot for the channel that this function is executed in."
-   #{"mute"} 
+   #{"mute"}
    (fn [{:keys [bot nick channel] :as com-m}]
      (when-privs com-m :admin
       (do
         (send-message com-m "Muting.")
         (dosync (alter bot update-in [:configs :mute :channels] conj channel))))))
-  
+
   (:cmd
    "Unmutes a channel that has been previously muted by :mute."
    #{"unmute"}

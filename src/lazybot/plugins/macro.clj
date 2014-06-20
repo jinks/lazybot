@@ -13,7 +13,6 @@
          (if (some identity (map #(.startsWith macro-body %) (:prepends (:config @bot))))
            (try-handle (assoc com-m :message macro-body))
            (send-message com-m macro-body))))))
-			  
   (:cmd
    "Add a macro, a shorthand form of writing tedious commands -- Admin only"
    #{"macro"}
@@ -39,6 +38,3 @@
           (send-message com-m (prefix nick macro-name " => " macro-body))
           (send-message com-m (prefix nick "that macro doesn't exist!"))))))
    (:indexes [[:macro-name]]))
-      
-    
-       

@@ -5,13 +5,13 @@
             [wordnik.api.words :as wwords]
             [clojure.string :as string]))
 
-(defplugin 
+(defplugin
   (:cmd
-   "Takes a word and look's up it's definition via the Wordnik dictionary API." 
-   #{"dict"} 
+   "Takes a word and look's up it's definition via the Wordnik dictionary API."
+   #{"dict"}
    (fn [{:keys [bot channel nick args] :as com-m}]
      (send-message
-      com-m 
+      com-m
       (prefix nick
               (if-let [the-word (first args)]
                 (let [key (get-in @bot [:config :dictionary :wordnik-key])
@@ -21,7 +21,7 @@
                     (str (:partOfSpeech definition) ": " text)
                     "Word not found."))
                 "You didn't give me a word. Duh.")))))
-  
+
   (:cmd
    "Wordnik's Word Of The Day"
    #{"wotd"}
@@ -54,4 +54,4 @@
                     (str "No phrases found for " (first args) ".")))
                 "I can't show you phrases if you don't give me a word."))))))
 
-   
+

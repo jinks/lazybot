@@ -55,7 +55,7 @@
                 "Heads."
                 "Tails.")))))
 
-  (:cmd 
+  (:cmd
    "Prints an amusing message."
    #{"what"}
    (fn [com-m] (send-message com-m "It's AWWWW RIGHT!")))
@@ -102,7 +102,7 @@
    #{"tc" "tempconv"}
    (fn [{:keys [nick args bot] :as com-m}]
      (let [num (->> args first rest (apply str) Integer/parseInt)]
-       (send-message com-m 
+       (send-message com-m
                      (prefix nick
                              (condp = (ffirst args)
                                  \F (* (- num 32) (/ 5 9.0))

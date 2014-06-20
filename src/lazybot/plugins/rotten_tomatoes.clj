@@ -53,7 +53,7 @@
                         (get-in @bot [:config :rotten-tomatoes :key])
                         (string/join " " args))
                       "Movie not found."))))
-  
+
   (:cmd
     "Get a list of the top 5 highest rated movies currently in theaters."
     #{"playing"}

@@ -90,7 +90,7 @@ specified in config.clj."
 (defn parse-issue
   "Parse an issue message into its user, repo, and issue number parts."
   [s]
-  (-> (zipmap [:user :repo :issue] 
+  (-> (zipmap [:user :repo :issue]
               (s/split s #"\/|#"))
       (update :issue #(Long. %))))
 

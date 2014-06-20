@@ -44,7 +44,7 @@
 (defplugin
   (:cmd
    "Evaluates some Haskell code. Doesn't print error messages and uses the TryHaskell API."
-   #{"tryhaskell"} 
+   #{"tryhaskell"}
    (heval-cmd eval-haskell))
 
   (:cmd

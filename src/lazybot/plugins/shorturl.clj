@@ -22,4 +22,3 @@
       (if-let [short (shortener (first args) (:hobbit-auth (:config @bot)))]
         (expand short (first args))
         "No URL shortener by that name was found.")))))
-		 

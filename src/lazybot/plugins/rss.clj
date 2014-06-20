@@ -9,12 +9,12 @@
   (let [items (take 3 (zf/xml-> zipper :channel :item))
 	items2 (take 3 (zf/xml-> zipper :item))
 	items3 (take 3 (zf/xml-> zipper :entry))]
-    (map (fn [item] 
-	   [(first (zf/xml-> item :title zf/text)) 
+    (map (fn [item]
+	   [(first (zf/xml-> item :title zf/text))
 	    (shorten-url (first (if-let [atom-link (seq (zf/xml-> item :link (zf/attr :href)))]
 				  atom-link
-				  (zf/xml-> item :link zf/text))) "isgd")]) 
-	 (cond (seq items)  items 
+				  (zf/xml-> item :link zf/text))) "isgd")])
+	 (cond (seq items)  items
 	       (seq items2) items2
 	       (seq items3) items3))))
 
@@ -24,7 +24,7 @@
 (defplugin
   (:cmd
    "Get's the first three results from an RSS or Atom feed."
-   #{"rss" "atom"} 
+   #{"rss" "atom"}
    (fn [{:keys [bot channel args] :as com-m}]
      (try
        (doseq [[title link] (pull-feed (first args))]
