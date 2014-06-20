@@ -23,7 +23,7 @@
                            ""))
         user-to (try-to-match #"^\s*-?(\w+)")
         margs (try-to-match #"\s*(s/[^/]+/[^/]*/?)$")
-        orig-msg (some #(get (get-in @message-map [com channel])
+        orig-msg (some #(get (get-in @message-map [(:network @com) channel])
                              %)
                        [user-to :channel-last])
         [regexp replacement] (next (re-find sed-regex margs))]
@@ -54,7 +54,7 @@
        (when (and (not= nick (:nick @com))
                   (not= (take 4 message)
                         (-> @bot :config :prepends first (str "sed"))))
-         (swap! message-map update-in [com channel]
+         (swap! message-map update-in [(:network @com) channel]
                 assoc nick message, :channel-last message)))))
 
   (:cmd
