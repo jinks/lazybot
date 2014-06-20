@@ -42,7 +42,7 @@
             :else [(str (get-in @bot [:config :prefix-arrow]) new-karma)
                    (alter limit update-in [nick snick] (fnil inc 0))])))]
     (when apply
-      (set-karma snick (:server @com) channel new-karma)
+      (set-karma snick (:network @com) channel new-karma)
       (schedule #(dosync (alter limit update-in [nick snick] dec))))
     (send-message com-m msg)))
 
@@ -51,7 +51,7 @@
   [f]
   (fn [{:keys [com channel args] :as com-m}]
     (let [snick (first args)
-          karma (get-karma snick (:server @com) channel)
+          karma (get-karma snick (:network @com) channel)
           new-karma (f karma)]
       (change-karma snick new-karma com-m))))
 
@@ -59,7 +59,7 @@
   (fn [{:keys [com bot channel args] :as com-m}]
     (let [nick (first args)]
       (send-message com-m
-                    (if-let [karma (get-karma nick (:server @com) channel)]
+                    (if-let [karma (get-karma nick (:network @com) channel)]
                       (str nick " has karma " karma ".")
                       (str "I have no record for " nick "."))))))
 

@@ -62,7 +62,7 @@
 
 (defn log-message [{:keys [com bot nick channel message action?]}]
   (let [config (:config @bot)
-        server (:server @com)]
+        server (:network @com)]
     (when-let [log-dir (log-dir config server channel)]
       (let [[date time] (date-time config)
             log-file (file log-dir (str date ".txt"))]
@@ -156,5 +156,5 @@
    :on-send-message
    (fn [com bot channel message action?]
      (log-message {:com com :bot bot :channel channel :message message
-                   :nick (:name @com) :action? action?})
+                   :nick (:nick @com) :action? action?})
      message)))

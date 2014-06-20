@@ -47,11 +47,11 @@
    :on-message
    (fn [{:keys [com bot nick message channel] :as com-m}]
      (when (and (get-in @bot [:config :sed :automatic?])
-                (not (when-let [blacklist (get-in @bot [:config (:server @com) :sed :blacklist])]
+                (not (when-let [blacklist (get-in @bot [:config (:network @com) :sed :blacklist])]
                        (blacklist channel))))
        (when (seq (re-find sed-regex message))
          (sed (assoc com-m :args [nick message]) false))
-       (when (and (not= nick (:name @com))
+       (when (and (not= nick (:nick @com))
                   (not= (take 4 message)
                         (-> @bot :config :prepends first (str "sed"))))
          (swap! message-map update-in [com channel]

@@ -30,7 +30,7 @@
         :else (recur (conj acc (first lines)) (rest lines)))))
    (catch java.lang.Exception e nil)))
 
-(defn url-blacklist-words [com bot] (:url-blacklist ((:config @bot) (:server @com))))
+(defn url-blacklist-words [com bot] (:url-blacklist ((:config @bot) (:network @com))))
 
 (defn url-check [com bot url]
   (some #(.contains url %) (url-blacklist-words com bot)))
@@ -40,7 +40,7 @@
 (defn title [{:keys [com nick bot user channel] :as com-m}
              links & {verbose? :verbose?}]
   (if (or (and verbose? (seq links))
-          (not (contains? (get-in @bot [:config (:server @com) :title :blacklist])
+          (not (contains? (get-in @bot [:config (:network @com) :title :blacklist])
                           channel)))
     (doseq [link (take 1 links)]
       (try
@@ -73,7 +73,7 @@
        (let [prepend (:prepends info)
              links (get-links message)
              title-links? (and (not (is-command? message prepend))
-                               (get-in info [(:server @com) :title :automatic?])
+                               (get-in info [(:network @com) :title :automatic?])
                                (seq links))]
          (when title-links?
            (title com-m links))))))

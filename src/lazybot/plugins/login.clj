@@ -39,10 +39,11 @@
   (:cmd 
    "Best executed via PM. Give it your password, and it will log you in."
    #{"login"}
-   (fn [{:keys [com bot nick hmask channel args] :as com-m}]
-     (if (check-login nick hmask (first args) (:server @com) bot)
-       (send-message com-m "You've been logged in.")
-       (send-message com-m "Username and password combination/hostmask do not match."))))
+   (fn [{:keys [com bot nick host user channel args] :as com-m}]
+     (let [hmask (s/join [nick "!" user "@" host])]
+       (if (check-login nick hmask (first args) (:network @com) bot)
+          (send-message com-m "You've been logged in.")
+          (send-message com-m "Username and password combination/hostmask do not match.")))))
   
   (:cmd
    "Logs you out."
@@ -60,7 +61,7 @@
          com-m
          (prefix nick
                  "You have privilege level "
-                 (if-let [user ((:users ((:config @bot) (:server @com))) nick)]
+                 (if-let [user ((:users ((:config @bot) (:network @com))) nick)]
                    (name (:privs user))
                    "nobody")
                  "; you are " 

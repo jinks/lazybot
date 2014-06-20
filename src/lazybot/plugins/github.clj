@@ -105,13 +105,13 @@ specified in config.clj."
 (defplugin
   (:init
    (fn [com bot]
-     (swap! bots assoc (:server @com) {:com com :bot bot})))
+     (swap! bots assoc (:network @com) {:com com :bot bot})))
   (:routes (POST "/commits" req (handler req)))
 
   (:hook
    :on-message
    (fn [{:keys [message nick bot com] :as com-m}]
-     (when-not ((get-in @bot [:config (:server @com) :user-blacklist]) nick)
+     (when-not ((get-in @bot [:config (:network @com) :user-blacklist]) nick)
        (doseq [issue (extract-issues message)]
          (when-let [message (issue-message (parse-issue issue))]
            (send-message com-m message)))))))

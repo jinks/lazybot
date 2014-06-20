@@ -4,7 +4,7 @@
         [useful.fn :only [!]]
         [clojail.core :only [thunk-timeout]]
         [clojure.string :only [join]])
-  (:require [irclj.core :as ircb]
+  (:require [irclj.core :as irclj]
             [somnium.congomongo :as mongo])
   (:import java.util.concurrent.TimeoutException))
 
@@ -65,21 +65,21 @@
 (defn send-message [{:keys [com bot channel]} s & {:keys [action? notice?]}]
   (if-let [result (call-message-hooks com bot channel s action?)]
     ((cond
-      action? ircb/send-action
-      notice? ircb/send-notice
-      :else ircb/send-message)
+      action? irclj/message
+      notice? irclj/message
+      :else irclj/message)
      com channel result)))
 
 (defn ignore-message? [{:keys [nick bot com]}]
   (-> @bot
-      (get-in [:config (:server @com) :user-blacklist])
+      (get-in [:config (:network @com) :user-blacklist])
       (contains? (.toLowerCase nick))))
 
-(defn try-handle [{:keys [nick channel bot message] :as com-m}]
+(defn try-handle [{:keys [nick channel target bot message] :as com-m}]
   (when-not (ignore-message? com-m)
     (on-thread
      (let [conf (:config @bot)
-           query? (= channel nick)
+           query? (= target nick)
            max-ops (:max-operations conf)]
        (when (or (is-command? message (:prepends conf)) query?)
          (if (dosync

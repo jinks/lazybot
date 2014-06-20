@@ -27,13 +27,15 @@
     (update-in seen-map [:time] #(- (now) %))))
 
 (defn put-seen [{:keys [nick channel com]} doing]
-  (tack-time nick (:server @com) channel doing))
+  (tack-time nick (:network @com) channel doing))
 
 (defplugin
   (:hook :on-message
          (fn [irc-map] (put-seen irc-map "talking")))
   (:hook :on-join
          (fn [irc-map] (put-seen irc-map "joining")))
+  (:hook :on-part
+         (fn [irc-map] (put-seen irc-map "leaving")))
   (:hook :on-quit
          (fn [irc-map] (put-seen irc-map "quitting")))
 
@@ -44,7 +46,7 @@
      (let [[who] args]
        (send-message com-m
                      (if-let [{:keys [time chan doing]}
-                              (get-seen who (:server @com))]
+                              (get-seen who (:network @com))]
 
                        (str who " was last seen " doing
                             (when-not (= doing "quitting") " on ")

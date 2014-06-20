@@ -5,7 +5,8 @@
         [clojure.set :only [intersection]]
         [compojure.core :only [routes]]
         [ring.middleware.params :only [wrap-params]]
-        [ring.adapter.jetty :only [run-jetty]])
+        [ring.adapter.jetty :only [run-jetty]]
+        [irclj.events :only [stdout-callback]])
   (:import [java.io File FileReader]))
 
 ;; This is pretty much the only global mutable state in the entire bot, and it
@@ -32,12 +33,32 @@
     (doseq [hook (pull-hooks bot hook-key)]
       (hook ircm))))
 
+(defn- augment [type ircm]
+  (condp = type
+    :on-message (assoc ircm :channel (first (:params ircm)) :message (:text ircm))
+    :on-join (assoc ircm :channel (first (:params ircm)))
+    :on-part (assoc ircm :channel (first (:params ircm)))
+    ircm))
+
+(defn dispatch
+  "Dispatch on type of message."
+  [irc type m]
+  (let [bot  (@bots (:network @irc))
+        ircm (merge m bot)]
+    ;(prn ircm)
+     (call-all (augment type ircm) type)))
+
 ;; Note that even the actual handling of commands is done via a hook.
 (def initial-hooks
   "The hooks that every bot, even without plugins, needs to have."
-  {:on-message [{:fn (fn [irc-map] (try-handle irc-map))}]
-   :on-quit []
-   :on-join []})
+  {:privmsg (fn [irc m] (dispatch irc :on-message m))
+   :join    (fn [irc m] (dispatch irc :on-join m))
+   :part    (fn [irc m] (dispatch irc :on-part m))
+   :mode    (fn [irc m] (dispatch irc :on-mode m))
+   :kick    (fn [irc m] (dispatch irc :on-kick m))
+   :nick    (fn [irc m] (dispatch irc :on-nick m))
+   :on-quit (fn [irc m] (dispatch irc :on-quit m))
+   :raw-log stdout-callback})
 
 (defn reload-config
   "Reloads and sets the configuration in a bot."
@@ -66,7 +87,7 @@
   "Load all plugins specified in the bot's configuration."
   [irc refzors]
   (let [info (:config @refzors)]
-    (doseq [plug (:plugins (info (:server @irc)))]
+    (doseq [plug (:plugins (info (:network @irc)))]
       (load-plugin irc refzors plug))))
 
 (defn reload-configs
@@ -100,12 +121,12 @@
   (require 'lazybot.registry :reload)
   (require 'lazybot.utilities :reload)
   (require 'lazybot.paste :reload)
-  (route (extract-routes bots))
-  (doseq [{:keys [com bot]} bots]
+  (route (extract-routes (vals @bots)))
+  (doseq [{:keys [com bot]} @bots]
     (doseq [{:keys [cleanup]} (vals (:modules @bot))]
       (when cleanup (cleanup)))
     (dosync
      (alter bot dissoc :modules)
-     (alter bot assoc-in [:modules :internal :hooks] initial-hooks)
+     (alter bot assoc-in [:modules :internal :hooks] {})
      (reload-config bot))
     (load-plugins com bot)))

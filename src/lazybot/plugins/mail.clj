@@ -70,7 +70,7 @@
      (if (seq args)
        (let [lower-user (.toLowerCase (first args))]
          (if (and (not (.contains lower-user "serv"))
-                  (not= lower-user (.toLowerCase (:name @com))))
+                  (not= lower-user (.toLowerCase (:nick @com))))
            (do
              (new-message nick lower-user (->> args rest (interpose " ") (apply str)))
              (send-message com-m "Message saved."))

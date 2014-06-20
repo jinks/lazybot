@@ -45,21 +45,19 @@
    "Get help with commands and stuff."
    #{"help"}
    (fn [{:keys [bot nick args] :as com-m}]
-     (let [help-msg (join
-                     " "
-                     (filter
-                      seq 
-                      (.split 
+     (let [help-msg (join " " (filter seq  (.split
                        (apply str (remove #(= \newline %) (find-docs bot (first args)))) " ")))]
        (if-not (seq help-msg)
          (let [topic (first args)
                content (fetch-one :help :where {:topic topic})]
            (cond
-            (not topic) (send-message com-m "You're going to need to tell me what you want help with.")
+            (not topic) (send-message com-m (str "You're going to need to tell me what you want help with. Try "
+                                                 (-> @bot :config :prepends first str)
+                                                 "list for a list of help topics."))
             content (send-message com-m (prefix nick (:content content)))
             :else (send-message com-m (str "Topic: \"" topic "\" doesn't exist!"))))
          (send-message com-m (prefix  nick help-msg))))))
-  
+
   (:cmd
    "Lists the available help topics in the DB."
    #{"list"}

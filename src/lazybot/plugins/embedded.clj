@@ -6,5 +6,5 @@
    :on-message
    (fn [{:keys [message bot] :as irc-map}]
      (doseq [x (reverse (re-seq #"\$#(.*?)#\$" message))]
-       (->> x second (-> @bot :config :prepends first str)
+       (->> x second str (-> @bot :config :prepends first str)
             (assoc irc-map :message) try-handle)))))

@@ -193,7 +193,7 @@
              (on-thread
               (try
                 (doseq [msg (eval-forms (if (nil? box?) true box?)
-                                        (:name @com) nick
+                                        (:nick @com) nick
                                         pre
                                         sexps)]
                   (send-message com-m msg))
