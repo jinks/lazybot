@@ -15,20 +15,6 @@
 
 (defplugin
   (:cmd
-   "Gets the current time and date in UTC format."
-   #{"time"}
-   (fn [{:keys [nick bot args] :as com-m}]
-     (let [time (unparse (formatters :date-time-no-ms)
-                         (if-let [[[m num]] (seq args)]
-                           (let [n (try (Integer/parseInt (str num)) (catch Exception _ 0))]
-                             (condp = m
-                                 \+ (plus (now) (hours n))
-                                 \- (minus (now) (hours n))
-                                 (now)))
-                           (now)))]
-       (send-message com-m (prefix nick "The time is now " time)))))
-
-  (:cmd
    "Joins a channel. Takes a channel and an optional password. ADMIN ONLY."
    #{"join"}
    (fn [{:keys [com bot nick args] :as com-m}]
@@ -108,19 +94,6 @@
                                  \F (* (- num 32) (/ 5 9.0))
                                  \C (+ 32 (* (/ 9.0 5) num))
                                  "Malformed expression."))))))
-
-  (:cmd
-   "Pings an IP address or host name. If it doesn't complete within 10 seconds, it will give up."
-   #{"ping"}
-   (fn [{:keys [bot nick args] :as com-m}]
-     (let [address (InetAddress/getByName (first args))
-           stime (now)]
-       (send-message
-        com-m
-        (prefix nick
-             (if (= false (.isReachable address 5000))
-               "FAILURE!"
-               (str "Ping completed in " (in-secs (interval stime (now))) " seconds.")))))))
 
   (:cmd
    "Executes a shell command and displays the STDOUT"
