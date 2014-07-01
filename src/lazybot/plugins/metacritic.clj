@@ -1,7 +1,8 @@
 (ns lazybot.plugins.metacritic
   (:require [lazybot.registry :refer [send-message defplugin]]
             [me.raynes.laser :as l]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [clj-http.client :as client]))
 
 (def paths
   {"xbox"  "/game/xbox-360/"
@@ -17,7 +18,8 @@
 (defn metacritic [args]
   (let [[type & args] args
         path (str url (paths type) (normalize args))]
-    (if-let [html (try (let [html (l/parse (slurp path))]
+    (println path)
+    (if-let [html (try (let [html (l/parse (:body (client/get path)))]
                          (when-not (seq (l/select html (l/class= "error_code")))
                            html))
                        (catch Exception _))]
@@ -25,11 +27,11 @@
                                [(l/select html
                                           (l/descendant-of
                                            (l/class= "main_details")
-                                           (l/class= "score_value")))
+                                           (l/class= "metascore_w")))
                                 (l/select html
                                           (l/descendant-of
                                            (l/class= "userscore_wrap")
-                                           (l/class= "score_value")))])]
+                                           (l/class= "metascore_w")))])]
         (str "Critics: " critic "; User: " user "  -  " path))
       "I'm a little drunk. Can't find my keys.")))
 
