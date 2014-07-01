@@ -43,10 +43,20 @@
      (when-privs com-m :admin
                (send-message com-m
                              (apply str (interpose " " (sort (keys (:modules @bot)))))))))
-  
+
   (:cmd
    "Reloads all plugins. ADMIN ONLY!"
    #{"reload"}
+   (fn [{:keys [args bot com] :as com-m}]
+     (when-privs com-m :admin
+                 (if-let [plugin (first args)]
+                   (do (unload-plugin* bot plugin) (load-plugin* bot com plugin)
+                     (send-message com-m (str "Reloaded " mod " successfully.")))
+                   (send-message com-m "Reload what?")))))
+
+  (:cmd
+   "Reloads all plugins. ADMIN ONLY!"
+   #{"reload-all"}
    (fn [{:keys [bot channel nick bot] :as com-m}]
      (when-privs com-m :admin
                (do
