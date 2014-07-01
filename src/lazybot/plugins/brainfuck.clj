@@ -1,5 +1,7 @@
 (ns lazybot.plugins.brainfuck
-  (:use lazybot.registry))
+  (:use lazybot.registry)
+  (:import (java.lang Thread)))
+
 ;;; From Rosettacode ;;;
 (def ^:dynamic *input*)
 
@@ -90,4 +92,5 @@
                      (compile-and-run input)
                      with-out-str
                      (#(.split % "\n")))]
-         (send-message com-m x))))))
+         (send-message com-m x)
+         (Thread/sleep 2000))))))
