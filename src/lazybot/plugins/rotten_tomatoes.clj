@@ -61,4 +61,4 @@
       (doseq [message (take (or (when (seq args) (Integer. (first args))) 5)
                             (in-theaters
                               (get-in @bot [:config :rotten-tomatoes :key])))]
-        (send-message (assoc com-m :channel nick) message :notice? true)))))
+        (send-message com-m message)))))

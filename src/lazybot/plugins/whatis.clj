@@ -2,12 +2,13 @@
   (:use [lazybot registry]
         [somnium.congomongo :only [fetch fetch-one insert! destroy!]]))
 
-(defn tell-about [what com-m]
-  (send-message com-m
-                (str what
-                     (if-let [result (fetch-one :whatis :where {:subject what})]
-                       (str " is " (:is result))
-                       " does not exist in my database."))))
+(defn tell-about
+  ([what who com-m]
+   (if-let [result (fetch-one :whatis :where {:subject what})]
+     (send-message com-m (str (if who (str who ": ") "") what " is " (:is result)))
+     (send-message com-m (str what " does not exist in my database."))))
+  ([what com-m]
+   (tell-about what nil com-m)))
 
 (defplugin
   (:cmd
@@ -34,9 +35,9 @@ Example - $tell G0SUB about clojure"
     #{"tell"}
     (fn [{[who _ what] :args :as com-m}]
       (when what
-        (tell-about what (assoc com-m :channel who)))))
-   
-   (:cmd 
+        (tell-about what who com-m))))
+
+   (:cmd
     "Forgets the value of a key."
     #{"forget"}
     (fn [{[what] :args :as com-m}]
