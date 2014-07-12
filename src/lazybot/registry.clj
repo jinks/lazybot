@@ -1,6 +1,6 @@
 (ns lazybot.registry
   (:use [useful.fn :only [fix to-fix]]
-        [lazybot.utilities :only [on-thread verify validator]]
+        [lazybot.utilities :only [on-thread verify validator periodically]]
         [useful.fn :only [!]]
         [clojail.core :only [thunk-timeout]]
         [clojure.string :only [join]])
@@ -8,6 +8,12 @@
             [somnium.congomongo :as mongo])
   (:import java.util.concurrent.TimeoutException))
 
+;; ## Message queueing
+(def send-queue (ref (clojure.lang.PersistentQueue/EMPTY)))
+
+(def process-messages (periodically (fn [] (if-let [message (dosync (when-let [msg (peek @send-queue)]
+                                                                      (do (alter send-queue pop) msg)))]
+                                             (apply irclj/message message))) 1600))
 ;; ## Hook handling
 (defn pull-hooks [bot hook-key]
   (map :fn
@@ -64,11 +70,7 @@
 ;; TODO: Document
 (defn send-message [{:keys [com bot channel]} s & {:keys [action? notice?]}]
   (if-let [result (call-message-hooks com bot channel s action?)]
-    ((cond
-      action? irclj/message
-      notice? irclj/message
-      :else irclj/message)
-     com channel result)))
+    (dosync (alter send-queue conj [com channel result]))))
 
 (defn ignore-message? [{:keys [nick bot com]}]
   (-> @bot

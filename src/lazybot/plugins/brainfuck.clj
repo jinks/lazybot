@@ -92,5 +92,4 @@
                      (compile-and-run input)
                      with-out-str
                      (#(.split % "\n")))]
-         (send-message com-m x)
-         (Thread/sleep 2000))))))
+         (send-message com-m x))))))

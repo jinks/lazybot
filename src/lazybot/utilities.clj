@@ -43,6 +43,9 @@
          (string/join " and "))))
 
 ;; ## Various utilities
+(defn periodically [callback ms]
+  (future (while true (do (Thread/sleep ms) (callback)))))
+
 (defn if-exists-read [file]
   (into {}
         (when (.exists (File. file))
