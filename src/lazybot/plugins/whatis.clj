@@ -1,6 +1,7 @@
 (ns lazybot.plugins.whatis
   (:use [lazybot registry]
-        [somnium.congomongo :only [fetch fetch-one insert! destroy!]]))
+        [lazybot.plugins.login :only [when-privs]]
+        [somnium.congomongo :only [fetch fetch-one insert! destroy! update!]]))
 
 (defn tell-about
   ([what who com-m]
@@ -17,11 +18,25 @@
    #{"learn"}
    (fn [{:keys [args] :as com-m}]
      (let [[subject & is] args
-           is-s (apply str (interpose " " is))]
-       (do
-         (destroy! :whatis {:subject subject})
-         (insert! :whatis {:subject subject :is is-s})
-         (send-message com-m "My memory is more powerful than M-x butterfly. I won't forget it.")))))
+           is-s (apply str (interpose " " is))
+           locked? (:locked (fetch-one :whatis :where {:subject subject}) false)]
+       (if-not locked?
+         (do
+          (destroy! :whatis {:subject subject})
+          (insert! :whatis {:subject subject :is is-s})
+          #_(send-message com-m "My memory is more powerful than M-x butterfly. I won't forget it.")
+          (send-message com-m "Memorised."))
+         (send-message com-m (str "Topic " subject " is locked."))))))
+
+  (:cmd
+   "Lock a topic"
+   #{"lock"}
+   (fn [{:keys [args] :as com-m}]
+     (if-let [result (fetch-one :whatis :where {:subject (first args)})]
+       (when-privs com-m :admin
+                   (update! :whatis result (merge result {:locked true}))
+                   (send-message com-m (str "Topic " (first args) " locked.")))
+       (send-message com-m (str "Topic " (first args) " not found.")))))
 
    (:cmd
     "Pass it a key, and it will tell you what is at the key in the database."
@@ -31,7 +46,7 @@
 
    (:cmd
     "Pass it a key, and it will tell the recipient what is at the key in the database via PM
-Example - $tell G0SUB about clojure"
+     Example - $tell G0SUB about clojure"
     #{"tell"}
     (fn [{[who _ what] :args :as com-m}]
       (when what
