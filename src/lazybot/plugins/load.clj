@@ -32,7 +32,7 @@
      (when-privs com-m :admin
                (if ((:modules @bot) (keyword (first args)))
                  (do
-                   (unload-plugin* bot (first args))
+                   (unload-plugin* bot (keyword (first args)))
                    (send-message com-m "Unloaded."))
                  (send-message com-m (str "Module " (first args) " not found."))))))
 
