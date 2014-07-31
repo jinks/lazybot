@@ -7,6 +7,7 @@
         [ring.middleware.params :only [wrap-params]]
         [ring.adapter.jetty :only [run-jetty]]
         [irclj.events :only [stdout-callback]])
+  (:require [irclj.core :as irclj])
   (:import [java.io File FileReader]))
 
 ;; This is pretty much the only global mutable state in the entire bot, and it
@@ -45,8 +46,7 @@
   [irc type m]
   (let [bot  (@bots (:network @irc))
         ircm (merge m bot)]
-    ;(prn ircm)
-     (call-all (augment type ircm) type)))
+    (call-all (augment type ircm) type)))
 
 ;; Note that even the actual handling of commands is done via a hook.
 (def initial-hooks
@@ -130,3 +130,16 @@
      (alter bot assoc-in [:modules :internal :hooks] {})
      (reload-config bot))
     (load-plugins com bot)))
+
+(defn reconnect
+  "Reconnect a bot's or all bots' irc connection"
+  ([] (->> @bots keys (map reconnect)))
+  ([server] (let [bot (-> @bots (get server) :bot)
+                  com (-> @bots (get server) :com)
+                  [port nick pass channels] ((juxt :port :bot-name :bot-password :channels)
+                                    (get-in @bot [:config server]))
+                  fnmap (:callbacks @com)
+                  _ (irclj/kill com)
+                  irc (irclj/connect server port nick :pass pass :callbacks fnmap)]
+              (apply (partial irclj/join irc) channels)
+              (dosync (swap! bots assoc-in [server :com] irc) nil))))
